@@ -41,34 +41,34 @@ export default function App() {
     setFriends((friends) => [...friends, friend]);
     setShowAddFriend(false);
   }
-  function handleSelect() {
-    setSelectedFriend((a) => !a);
+  function handleSelection(friend) {
+    setSelectedFriend(friend);
   }
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsList onSelect={handleSelect} friends={friends} />
+        <FriendsList onSelection={handleSelection} friends={friends} />
         {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
         <Button className="button" onClick={handleShowAddFriend}>
           {showAddFriend ? "Close" : "Add Friend"}
         </Button>
       </div>
-      {selectedFriend ? <FormSplitFill /> : ""}
+      {selectedFriend ? <FormSplitFill selectedFriend={selectedFriend} /> : ""}
     </div>
   );
 }
 
-function FriendsList({ friends, onSelect }) {
+function FriendsList({ friends, onSelection }) {
   return (
     <ul>
       {friends.map((friend) => (
-        <Friend friend={friend} key={friend.id} onSelect={onSelect} />
+        <Friend friend={friend} key={friend.id} onSelection={onSelection} />
       ))}
     </ul>
   );
 }
 
-function Friend({ friend, onSelect }) {
+function Friend({ friend, onSelection }) {
   return (
     <li>
       <img src={friend.image} alt={friend.name} />
@@ -88,7 +88,7 @@ function Friend({ friend, onSelect }) {
         ""
       )}
       {friend.balance === 0 ? <p>You and {friend.name} are even</p> : ""}
-      <Button onClick={onSelect}>Select</Button>
+      <Button onClick={() => onSelection(friend)}>Select</Button>
     </li>
   );
 }
@@ -128,20 +128,20 @@ function FormAddFriend({ onAddFriend }) {
   );
 }
 
-function FormSplitFill() {
+function FormSplitFill({ selectedFriend }) {
   return (
     <form className="form-split-bill">
-      <h2>Split a bill with X</h2>
+      <h2>Split a bill with {selectedFriend.name}</h2>
       <label>💰Bill Value</label>
       <input type="text" />
       <label>🚹Your expenses</label>
       <input type="text" />
-      <label>👬X's expenses</label>
+      <label>👬{selectedFriend.name} expenses</label>
       <input type="text" disabled />
       <label>😝Who is paying the bill</label>
       <select>
         <option value="user">You</option>
-        <option value="friend">X's</option>
+        <option value="friend">{selectedFriend.name}</option>
       </select>
     </form>
   );
