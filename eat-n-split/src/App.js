@@ -32,35 +32,43 @@ function Button({ children, onClick }) {
 export default function App() {
   const [friends, setFriends] = useState(initialFriends);
   const [showAddFriend, setShowAddFriend] = useState(0);
-  const handleShowAddFriend = () => setShowAddFriend((a) => !a);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  function handleShowAddFriend() {
+    setShowAddFriend((show) => !show);
+  }
+
   function handleAddFriend(friend) {
-    setFriends((friend) => [...friends, friend]);
+    setFriends((friends) => [...friends, friend]);
+    setShowAddFriend(false);
+  }
+  function handleSelect() {
+    setSelectedFriend((a) => !a);
   }
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsList friends={friends} />
+        <FriendsList onSelect={handleSelect} friends={friends} />
         {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
         <Button className="button" onClick={handleShowAddFriend}>
           {showAddFriend ? "Close" : "Add Friend"}
         </Button>
       </div>
-      <FormSplitFill />
+      {selectedFriend ? <FormSplitFill /> : ""}
     </div>
   );
 }
 
-function FriendsList({ friends }) {
+function FriendsList({ friends, onSelect }) {
   return (
     <ul>
-      {friends.map((e) => {
-        return <Friend friend={e} key={e.id} />;
-      })}
+      {friends.map((friend) => (
+        <Friend friend={friend} key={friend.id} onSelect={onSelect} />
+      ))}
     </ul>
   );
 }
 
-function Friend({ friend }) {
+function Friend({ friend, onSelect }) {
   return (
     <li>
       <img src={friend.image} alt={friend.name} />
@@ -80,7 +88,7 @@ function Friend({ friend }) {
         ""
       )}
       {friend.balance === 0 ? <p>You and {friend.name} are even</p> : ""}
-      <Button>Select</Button>
+      <Button onClick={onSelect}>Select</Button>
     </li>
   );
 }
@@ -91,13 +99,13 @@ function FormAddFriend({ onAddFriend }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    const id = crypto.randomUUID();
     if (!name || !img) return;
+    const id = crypto.randomUUID();
     const newFriend = {
+      id,
       name,
       img: `${img}?=${id}`,
       balance: 0,
-      id,
     };
     console.log(newFriend);
     onAddFriend(newFriend);
